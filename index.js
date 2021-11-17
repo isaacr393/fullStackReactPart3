@@ -9,6 +9,7 @@ const morganLog = (token, req, res) => {
     return ` ${req.method} -  ${req.url} -  ${JSON.stringify( req.body )} -  ${token['response-time'](req, res)} -ms`
 }
 
+app.use(express.static('build'))
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -103,6 +104,6 @@ app.get('/info', (req, res) => {
 })
 
 
-const port = 3001
+const port = process.env.PORT || 3001
 app.listen(port)
 console.log(`App running in port ${port}`)
