@@ -56,6 +56,9 @@ app.post('/persons', (req,res) => {
         return res.status(400).json({error: 'fields incomplete'})
     }
 
+    if( data.some( person => person.name.toLowerCase() === req.body.name.toLowerCase()))
+        return res.status(400).json({error: 'A person with that name already exists'})
+
     let id = Math.random() * (1000000 - 0) + 0
     let person = {
         id: id,
