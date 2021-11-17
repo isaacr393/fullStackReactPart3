@@ -39,6 +39,14 @@ app.get('/persons/:id', (req, res) => {
         res.status(404).json({msg: `No entry for id: ${id}`})
 })
 
+app.delete('/persons/:id', (req, res) => {
+    const id = Number( req.params.id )
+
+    data = data.filter( person => person.id !== id)
+
+    res.status(204).end()
+})
+
 app.get('/info', (req, res) => {
     res.end(`PhoneBook has info for ${data.length} people
     
