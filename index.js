@@ -2,6 +2,10 @@ const express = require('express')
 
 const app = express()
 
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+
 let data = [
     { 
       "id": 1,
@@ -45,6 +49,22 @@ app.delete('/persons/:id', (req, res) => {
     data = data.filter( person => person.id !== id)
 
     res.status(204).end()
+})
+
+app.post('/persons', (req,res) => {
+    if( !req.body.name || !req.body.number){
+        return res.status(400).json({error: 'fields incomplete'})
+    }
+
+    let id = Math.random() * (1000000 - 0) + 0
+    let person = {
+        id: id,
+        name: req.body.name,
+        number: req.body.number
+    }
+
+    data.push(person)
+    res.json({data: person})
 })
 
 app.get('/info', (req, res) => {
