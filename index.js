@@ -1,5 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
+const { request } = require('express')
 
 const app = express()
 
@@ -7,6 +9,7 @@ const morganLog = (token, req, res) => {
     return ` ${req.method} -  ${req.url} -  ${JSON.stringify( req.body )} -  ${token['response-time'](req, res)} -ms`
 }
 
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan(morganLog));
@@ -73,7 +76,24 @@ app.post('/persons', (req,res) => {
     }
 
     data.push(person)
-    res.json({data: person})
+    res.json(person)
+})
+
+app.put('/persons/:id', (req, res) => {
+    if( !req.body.name || !req.body.number){
+        return res.status(400).json({error: 'fields incomplete'})
+    }
+    data = data.map( person => {
+        if( person.id != req.params.id )
+            return person
+        else    
+            return {
+                ...person,
+                name:req.body.name,
+                number: req.body.number
+            }
+    })
+    return res.json( {...req.body} )
 })
 
 app.get('/info', (req, res) => {
