@@ -29,6 +29,12 @@ app.get('/persons', (req, res) => {
     res.json(data)
 })
 
+app.get('/info', (req, res) => {
+    res.end(`PhoneBook has info for ${data.length} people
+    
+    ${new Date()}`)
+})
+
 
 const port = 3001
 app.listen(port)
