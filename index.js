@@ -29,6 +29,16 @@ app.get('/persons', (req, res) => {
     res.json(data)
 })
 
+app.get('/persons/:id', (req, res) => {
+    const id = Number( req.params.id )
+    let person = data.find( person => person.id === id)
+
+    if( person )
+        res.json(person)
+    else 
+        res.status(404).json({msg: `No entry for id: ${id}`})
+})
+
 app.get('/info', (req, res) => {
     res.end(`PhoneBook has info for ${data.length} people
     
