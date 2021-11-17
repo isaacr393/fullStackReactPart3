@@ -3,9 +3,13 @@ const morgan = require('morgan')
 
 const app = express()
 
+const morganLog = (token, req, res) => {
+    return ` ${req.method} -  ${req.url} -  ${JSON.stringify( req.body )} -  ${token['response-time'](req, res)} -ms`
+}
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(morgan('tiny'));
+app.use(morgan(morganLog));
 
 
 let data = [
