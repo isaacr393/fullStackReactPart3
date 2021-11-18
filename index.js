@@ -48,13 +48,11 @@ app.get('/persons', (req, res) => {
 })
 
 app.get('/persons/:id', (req, res) => {
-    const id = Number( req.params.id )
-    let person = data.find( person => person.id === id)
-
-    if( person )
-        res.json(person)
-    else 
-        res.status(404).json({msg: `No entry for id: ${id}`})
+    Person.findById(req.params.id)
+    .then( person => res.json(person) )
+    .catch( err => res.json( err ) )
+ 
+    //res.status(404).json({msg: `No entry for id: ${id}`})
 })
 
 app.delete('/persons/:id', (req, res) => {
@@ -70,18 +68,14 @@ app.post('/persons', (req,res) => {
         return res.status(400).json({error: 'fields incomplete'})
     }
 
-    if( data.some( person => person.name.toLowerCase() === req.body.name.toLowerCase()))
-        return res.status(400).json({error: 'A person with that name already exists'})
-
-    let id = Math.random() * (1000000 - 0) + 0
-    let person = {
-        id: id,
+    let person = new Person({
         name: req.body.name,
         number: req.body.number
-    }
+    })
 
-    data.push(person)
-    res.json(person)
+    person.save()
+    .then( person => res.json(person))
+    .catch( err => res.status(500).end('Error at registering') )
 })
 
 app.put('/persons/:id', (req, res) => {
