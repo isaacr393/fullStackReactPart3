@@ -69,21 +69,17 @@ app.post('/persons', (req,res, next) => {
     .catch( err => next(err) )
 })
 
-app.put('/persons/:id', (req, res) => {
+app.put('/persons/:id', (req, res,next) => {
     if( !req.body.name || !req.body.number){
         return res.status(400).json({error: 'fields incomplete'})
     }
-    data = data.map( person => {
-        if( person.id != req.params.id )
-            return person
-        else    
-            return {
-                ...person,
-                name:req.body.name,
-                number: req.body.number
-            }
-    })
-    return res.json( {...req.body} )
+    let updatedPerson = {
+        name:req.body.name,
+        number: req.body.number
+    }
+    Person.findByIdAndUpdate(req.params.id, updatedPerson, {new:true})
+    .then( newPerson => res.json( {...req.body} ))
+    .catch( err => next(err))
 })
 
 app.get('/info', (req, res) => {
