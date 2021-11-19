@@ -44,18 +44,17 @@ app.get('/persons/:id', (req, res) => {
     //res.status(404).json({msg: `No entry for id: ${id}`})
 })
 
-app.delete('/persons/:id', (req, res) => {
+app.delete('/persons/:id', (req, res, next) => {
 
     Person.findByIdAndRemove(req.params.id)
     .then( () => res.status(204).end() )
     .catch( err => {
-        console.log(err)
-        res.status(400).send({err: 'Malformatted id '})
+        next(err)
     })
 
 })
 
-app.post('/persons', (req,res) => {
+app.post('/persons', (req,res, next) => {
     if( !req.body.name || !req.body.number){
         return res.status(400).json({error: 'fields incomplete'})
     }
@@ -67,7 +66,7 @@ app.post('/persons', (req,res) => {
 
     person.save()
     .then( person => res.json(person))
-    .catch( err => res.status(500).end('Error at registering') )
+    .catch( err => next(err) )
 })
 
 app.put('/persons/:id', (req, res) => {
@@ -93,7 +92,19 @@ app.get('/info', (req, res) => {
     ${new Date()}`)
 })
 
+const errHandler = (err, req, res, next) => {
+  console.error(err.message)
+
+  if (err.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(err)
+
+}
+
 app.use(unknownEndpoint)
+app.use(errHandler)
 
 
 const port = process.env.PORT || 3001
