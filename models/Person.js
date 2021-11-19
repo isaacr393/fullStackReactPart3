@@ -8,7 +8,7 @@ mongoose.connect(url)
 .catch( (err) => console.log('Error at connecting' , err.message))
 
 const PhonebookSchema = new mongoose.Schema({
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true, unique: true, minLength: 8},
     number: { type: String, required: true, unique: true }
 })
 PhonebookSchema.plugin(uniqueValidator)

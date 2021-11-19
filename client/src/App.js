@@ -22,22 +22,28 @@ const App = () => {
     e.preventDefault()
 
     let prevPerson = findPerson(newName)
+    prevPerson = {...prevPerson}
     if( prevPerson ){
       //alert(`A person with the name ${newName} already exists`)
       if( ! window.confirm( `Are you sure to update ${newName}'s number?`) )
       return false
-      else{
-        prevPerson.number = number
-        ClientApi.updateRegiser(prevPerson)
-        .then( () => {
-          setPersons(persons.map( person => person.id !== prevPerson.id?person: {...prevPerson }))
-          setmessage({msg:'Person Updated succesfully', type:'SUCCESS'})
-          setTimeout( () => {
-            setmessage({msg:'', type:''})
-          }, 3000)
-        })
-        .catch( err => console.log( err ))
-      }
+      
+      prevPerson.number = number
+      ClientApi.updateRegiser(prevPerson)
+      .then( () => {        
+        setmessage({msg:'Person Updated succesfully', type:'SUCCESS'})
+        setPersons(persons.map( person => person.id !== prevPerson.id?person: {...prevPerson }))
+        setTimeout( () => {
+          setmessage({msg:'', type:''})
+        }, 6000)
+      })
+      .catch( err => {
+        setmessage({msg:`${err.response.data.error}`, type:'ERROR'})
+        setTimeout( () => {
+          setmessage({msg:'', type:''})
+        }, 6000)
+      })
+
     }else{
       ClientApi.create({name:newName, number:number})
       .then( (data) => {
@@ -45,9 +51,14 @@ const App = () => {
         setmessage({msg:'Person created succesfully', type:'SUCCESS'})
         setTimeout( () => {
           setmessage({msg:'', type:''})
-        }, 3000)
+        }, 6000)
       })
-      .catch( err => console.log( 'Err Here' ,err ))
+      .catch( err => {
+        setmessage({msg:`${err.response.data.error}`, type:'ERROR'})
+        setTimeout( () => {
+          setmessage({msg:'', type:''})
+        }, 6000)
+      })
     }
 
     setNewName('')
@@ -141,8 +152,8 @@ const Notification = ({msg, type}) => {
     return null
   
   let styleClass = {
-    borderColor: type ==='ERROR'?'red':'green',
     border: '1px',
+    borderColor: type ==='ERROR'?'red':'green',
     backgroundColor:type ==='ERROR'?'red':'green',
     padding:15,
     margin:10
