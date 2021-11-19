@@ -22,12 +22,11 @@ const App = () => {
     e.preventDefault()
 
     let prevPerson = findPerson(newName)
-    prevPerson = {...prevPerson}
     if( prevPerson ){
       //alert(`A person with the name ${newName} already exists`)
       if( ! window.confirm( `Are you sure to update ${newName}'s number?`) )
       return false
-      
+      prevPerson = {...prevPerson}
       prevPerson.number = number
       ClientApi.updateRegiser(prevPerson)
       .then( () => {        
