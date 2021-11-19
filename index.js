@@ -11,36 +11,17 @@ const app = express()
 const morganLog = (token, req, res) => {
     return ` ${req.method} -  ${req.url} -  ${JSON.stringify( req.body )} -  ${token['response-time'](req, res)} -ms`
 }
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+  
+  // handler of requests with unknown endpoint
 
 app.use(express.static('build'))
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan(morganLog));
-
-
-let data = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
 
 app.get('/persons', (req, res) => {
     Person.find({})
@@ -49,18 +30,29 @@ app.get('/persons', (req, res) => {
 
 app.get('/persons/:id', (req, res) => {
     Person.findById(req.params.id)
-    .then( person => res.json(person) )
-    .catch( err => res.json( err ) )
+    .then( person => {
+        if(person)
+        res.json(person)
+        else
+        res.status(404).end()
+    })
+    .catch( err =>{
+        console.log(err)
+        res.status(400).send({error: 'Malformated id'})
+    })
  
     //res.status(404).json({msg: `No entry for id: ${id}`})
 })
 
 app.delete('/persons/:id', (req, res) => {
-    const id = Number( req.params.id )
 
-    data = data.filter( person => person.id !== id)
+    Person.findByIdAndRemove(req.params.id)
+    .then( () => res.status(204).end() )
+    .catch( err => {
+        console.log(err)
+        res.status(400).send({err: 'Malformatted id '})
+    })
 
-    res.status(204).end()
 })
 
 app.post('/persons', (req,res) => {
@@ -100,6 +92,8 @@ app.get('/info', (req, res) => {
     
     ${new Date()}`)
 })
+
+app.use(unknownEndpoint)
 
 
 const port = process.env.PORT || 3001
