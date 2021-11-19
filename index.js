@@ -28,7 +28,7 @@ app.get('/persons', (req, res) => {
     .then( persons => res.json(persons))
 })
 
-app.get('/persons/:id', (req, res) => {
+app.get('/persons/:id', (req, res, next) => {
     Person.findById(req.params.id)
     .then( person => {
         if(person)
@@ -37,8 +37,7 @@ app.get('/persons/:id', (req, res) => {
         res.status(404).end()
     })
     .catch( err =>{
-        console.log(err)
-        res.status(400).send({error: 'Malformated id'})
+        next(err)
     })
  
     //res.status(404).json({msg: `No entry for id: ${id}`})
@@ -83,9 +82,10 @@ app.put('/persons/:id', (req, res,next) => {
 })
 
 app.get('/info', (req, res) => {
-    res.end(`PhoneBook has info for ${data.length} people
-    
-    ${new Date()}`)
+    Person.estimatedDocumentCount({})
+    .then( length => {
+        res.end(`PhoneBook has info for ${length} people ${new Date()}`)
+    } )
 })
 
 const errHandler = (err, req, res, next) => {
