@@ -38,13 +38,13 @@ if( type === 'CREATE'){
         number
     })
     newPerson.save()
-    .then(result => {
+    .then(() => {
         console.log(`Person created succesfully ${name}, ${number}`)
         mongoose.connection.close()
         process.exit(1)
     })
 }else if (type === 'LIST' ){
-    let persons = Person.find({})
+    Person.find({})
     .then(result => {
         result.forEach( person => console.log(person))
         mongoose.connection.close()
