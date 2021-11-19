@@ -54,9 +54,9 @@ app.delete('/persons/:id', (req, res, next) => {
 })
 
 app.post('/persons', (req,res, next) => {
-    if( !req.body.name || !req.body.number){
+    /* if( !req.body.name || !req.body.number){
         return res.status(400).json({error: 'fields incomplete'})
-    }
+    } */
 
     let person = new Person({
         name: req.body.name,
@@ -93,7 +93,9 @@ const errHandler = (err, req, res, next) => {
 
   if (err.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
-  } 
+  }else if (err.name === 'ValidationError') {
+    return res.status(400).json({ error: err.message })  
+  }
 
   next(err)
 
